@@ -1,6 +1,14 @@
 <template>
+
     <div>
-        <p>用户列表</p>
+        <headerComponent></headerComponent>
+
+        <div id='top2' style='margin: 20px 0 20px 0'>
+            主页
+            <a href='http://localhost:8080/#/notify' style='margin: 0 20px 0 20px'>公告板</a>
+        </div>
+
+        ===================================================
 
         <div id='main' v-for="item in response">
             <div style='margin-right: 20px'>用户名：{{ item.userName }}</div>
@@ -8,9 +16,7 @@
             <button id='delBtn' v-on:click="deleteUser(item)" v-if="!checkAdmin(item)">删除</button>
         </div>
 
-        <p><button id='delBtn' v-on:click="logout">退出</button></p>
-
-        <p></p>
+        ===================================================
     </div>
 
 </template>
@@ -18,18 +24,24 @@
 
 <script>
     import axios from 'axios'; 
+    import headerComponent from './header.vue';
 
     export default({
         name: 'index',
 
+        components: {
+            headerComponent
+        },
+
         data:  function(){
                 return {
-                    response: []
+                    response: [],
+                    user: {}
                 }
             },
         
         created: function () {
-            this.getList();
+            this.getUserList();
         },
 
         methods: {
@@ -37,9 +49,10 @@
                return item.userName == 'caoguoli';
             },
             
-            getList:  function() {
+            getUserList:  function() {
                 axios.get("http://localhost:8082/getAllUsers")
                     .then((res)=>{
+                        console.log("getList", res.data);
 
                         if(res.data.success){
                             this.response = res.data.data.map(
@@ -49,8 +62,6 @@
                         }else{
                             alert(res.data.message);
                         }
-
-                        console.log("getList", res.data);
                     }) 
             },
 
@@ -73,21 +84,12 @@
                         console.log("delete", res.data);
                     }) 
             },
-
-            logout: function() {
-
-                axios.get("http://localhost:8082/logout").then(
-                    (res)=>{ 
-                        console.log("delete", res.data); 
-                        this.$router.push({path:'/login'})
-                }) 
-            }
         }
     });
 </script>
 
 <style>
-  #main {
+  #main, #top2{
     margin: 10px;
     display: flex;
   }
@@ -95,4 +97,9 @@
   #delBtn {
     margin-left: 20px;
   }
+
+  #top2 {
+    margin: 20px 0 20px 0
+  }
+
 </style>

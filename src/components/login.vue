@@ -32,8 +32,8 @@
 
         data:  function(){
                 return {
-                    userLoginName: "",
-                    passWord: "",
+                    userLoginName: "mylove",
+                    passWord: "0987654321",
                     response: ""
                 }
             },
