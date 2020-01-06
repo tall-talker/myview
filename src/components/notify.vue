@@ -14,20 +14,24 @@
                 <br>内容：<br><textarea placeholder="请输入内容" cols='40' rows='5' v-model="content" style='margin-right: 20px'/></br></br>
 
                 <button v-on:click='createNotify'>新建公告</button>
+
+                <div style='margin-top: 20px'>{{message}}</div>
             </div>
         </div>
 
         =============================================================
 
-        <div v-for="item in response">
-            <div style='margin-top: 20px'>标题：{{ item.title }}</div>
-            <div>内容：{{ item.content }}</div>
+        <div v-for="item in response" style='margin: 10px 0 10px 0'>
+            <div>标题：{{ item.title }}</div>
+            <div style='width: 500px'>内容：{{ item.content }}</div>
             <div>发布人：{{ item.author }}</div>
-            <div>发布日期：{{ item.createDate }}</div>
+            <div>发布日期：{{ item.publishDate }}</div>
             <button class='mgl' v-on:click="deleteNotify(item)">删除公告</button>
         </div>
 
         =============================================================
+
+        <div style='margin-bottom: 200px'></div>
     </div>
 
 </template>
@@ -44,6 +48,7 @@
                     response: [],
                     title: '',
                     content: '',
+                    message: ''
                 }
             },
         
@@ -63,10 +68,7 @@
                         console.log("getNotifies", res.data);
 
                         if(res.data.success){
-                            this.response = res.data.data.map(
-                                function(obj){
-                                    return {'title': obj.title, 'content': obj.content, 'author': obj.author, 'createDate': obj.publishDate}
-                            });
+                            this.response = res.data.data;
                         }else{
                             alert(res.data.message);
                         }
@@ -75,7 +77,6 @@
 
          
             logout: function() {
-
                 axios.get("http://localhost:8082/logout").then(
                     (res)=>{ 
                         console.log("delete", res.data); 
@@ -84,18 +85,19 @@
             },
 
             createNotify: function(){
+                this.message = '';
+
                 const notifyParams = {
-                    params: {
-                        title: this.title,
-                        content: this.content
-                    }
+                    params: { title: this.title, content: this.content }
                 };
 
                 axios.get("http://localhost:8082/createNotify", notifyParams).then(
                     (res)=>{ 
                         
                         if(res.data.success){
+                            this.message = res.data;
                             this.getNotifies();
+
                         }else{
                             console.log('createNotify', res.data);
                         }
@@ -104,11 +106,7 @@
             },
 
             deleteNotify: function(item){
-                const notifyParams = {
-                    params: {
-                        title: item.title,
-                    }
-                };
+                const notifyParams = { params: { id: item.id } };
 
                 axios.get("http://localhost:8082/deleteNotify", notifyParams).then(
                     (res)=>{ 
